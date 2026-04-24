@@ -1,10 +1,17 @@
 {
   "buildCommand": "cd client && npm install && npm run build",
   "outputDirectory": "client/dist",
-  "installCommand": "npm install && cd client && npm install",
-  "framework": null,
+  "installCommand": "npm install axios",
+  "functions": {
+    "api/**/*.js": {
+      "memory": 256,
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/api/gigs", "destination": "/api/gigs" },
+    { "source": "/api/stats", "destination": "/api/stats" },
+    { "source": "/api/token/:chain/:address", "destination": "/api/token/[chain]/[address]" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

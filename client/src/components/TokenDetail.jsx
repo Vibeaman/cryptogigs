@@ -29,7 +29,7 @@ function TokenDetail() {
     const fetchToken = async () => {
       setLoading(true)
       try {
-        const res = await axios.get(`/api/gigs/${chain}/${address}`)
+        const res = await axios.get(`/api/token/${chain}/${address}`)
         setToken(res.data.token)
       } catch (err) {
         setError('Failed to fetch token details')
