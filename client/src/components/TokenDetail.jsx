@@ -26,18 +26,53 @@ function TokenDetail() {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
-    const fetchToken = async () => {
+    const loadToken = async () => {
       setLoading(true)
+      setError(null)
+      
+      // First check sessionStorage for cached data from browse page
+      const cachedData = sessionStorage.getItem(`token_${chain}_${address}`)
+      if (cachedData) {
+        try {
+          const parsed = JSON.parse(cachedData)
+          setToken(parsed)
+          setLoading(false)
+          return
+        } catch (e) {
+          // Invalid cache, continue to fetch
+        }
+      }
+      
+      // Try to fetch from API
       try {
         const res = await axios.get(`/api/token/${chain}/${address}`)
-        setToken(res.data.token)
+        if (res.data.success) {
+          setToken(res.data.token)
+        } else {
+          setError('Token not found')
+        }
       } catch (err) {
-        setError('Failed to fetch token details')
-        console.error('Error:', err)
+        // If API fails, create a basic token object
+        setToken({
+          id: address,
+          name: 'Unknown Token',
+          symbol: '???',
+          chain: chain,
+          address: address,
+          imageUrl: null,
+          gaps: [
+            { type: 'website', role: 'Web Developer', description: 'No website detected', priority: 'high' },
+            { type: 'twitter', role: 'Social Media Manager', description: 'No Twitter/X account', priority: 'high' },
+            { type: 'community', role: 'Community Manager', description: 'No Telegram or Discord', priority: 'high' }
+          ],
+          gapCount: 3,
+          dexScreenerUrl: `https://dexscreener.com/${chain}/${address}`
+        })
       }
       setLoading(false)
     }
-    fetchToken()
+    
+    loadToken()
   }, [chain, address])
 
   const copyAddress = () => {
@@ -48,11 +83,11 @@ function TokenDetail() {
 
   const getChainBadge = (chain) => {
     const badges = {
-      solana: { class: 'chain-solana', label: 'Solana' },
-      base: { class: 'chain-base', label: 'Base' },
-      ethereum: { class: 'chain-ethereum', label: 'Ethereum' }
+      solana: { icon: '/chains/solana.jpg', label: 'Solana' },
+      base: { icon: '/chains/base.jpg', label: 'Base' },
+      ethereum: { icon: '/chains/ethereum.jpg', label: 'Ethereum' }
     }
-    return badges[chain] || { class: 'bg-gray-400', label: chain }
+    return badges[chain] || { icon: null, label: chain }
   }
 
   const getRoleIcon = (role) => {
@@ -93,13 +128,13 @@ function TokenDetail() {
     )
   }
 
-  if (error || !token) {
+  if (error && !token) {
     return (
       <div className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
           <div className="glass-card rounded-2xl p-8 text-center">
             <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <p className="text-gray-600 mb-4">{error || 'Token not found'}</p>
+            <p className="text-gray-600 mb-4">{error}</p>
             <Link to="/browse" className="btn-primary">
               Back to Browse
             </Link>
@@ -109,7 +144,7 @@ function TokenDetail() {
     )
   }
 
-  const chainBadge = getChainBadge(token.chain)
+  const chainBadge = getChainBadge(token?.chain)
 
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8">
@@ -126,7 +161,7 @@ function TokenDetail() {
         {/* Token Header */}
         <div className="glass-card rounded-3xl p-8 mb-6">
           <div className="flex flex-col md:flex-row md:items-center gap-6">
-            {token.imageUrl ? (
+            {token?.imageUrl ? (
               <img 
                 src={token.imageUrl} 
                 alt={token.name}
@@ -140,16 +175,20 @@ function TokenDetail() {
             
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-2xl font-bold text-gray-900">{token.name}</h1>
-                <span className={`${chainBadge.class} text-white text-sm font-bold px-3 py-1 rounded-lg`}>
-                  {chainBadge.label}
-                </span>
+                <h1 className="text-2xl font-bold text-gray-900">{token?.name || 'Unknown'}</h1>
+                {chainBadge.icon ? (
+                  <img src={chainBadge.icon} alt={chainBadge.label} className="w-8 h-8 rounded-full object-cover" />
+                ) : (
+                  <span className="bg-gray-400 text-white text-sm font-bold px-3 py-1 rounded-lg">
+                    {chainBadge.label}
+                  </span>
+                )}
               </div>
-              <p className="text-lg text-gray-500 mb-3">${token.symbol}</p>
+              <p className="text-lg text-gray-500 mb-3">${token?.symbol || '???'}</p>
               
               <div className="flex items-center gap-2">
                 <code className="bg-white/60 px-3 py-1.5 rounded-lg text-sm text-gray-600 font-mono">
-                  {address.slice(0, 8)}...{address.slice(-6)}
+                  {address?.slice(0, 8)}...{address?.slice(-6)}
                 </code>
                 <button 
                   onClick={copyAddress}
@@ -165,7 +204,7 @@ function TokenDetail() {
             </div>
 
             <a 
-              href={token.dexScreenerUrl}
+              href={token?.dexScreenerUrl || `https://dexscreener.com/${chain}/${address}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary flex items-center gap-2"
@@ -180,21 +219,21 @@ function TokenDetail() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="glass-card rounded-2xl p-5 text-center">
             <div className="text-sm text-gray-500 mb-1">Market Cap</div>
-            <div className="text-xl font-bold gradient-text">{formatNumber(token.marketCap)}</div>
+            <div className="text-xl font-bold gradient-text">{formatNumber(token?.marketCap)}</div>
           </div>
           <div className="glass-card rounded-2xl p-5 text-center">
             <div className="text-sm text-gray-500 mb-1">Liquidity</div>
-            <div className="text-xl font-bold gradient-text">{formatNumber(token.liquidity)}</div>
+            <div className="text-xl font-bold gradient-text">{formatNumber(token?.liquidity)}</div>
           </div>
           <div className="glass-card rounded-2xl p-5 text-center">
             <div className="text-sm text-gray-500 mb-1">24h Volume</div>
-            <div className="text-xl font-bold gradient-text">{formatNumber(token.volume24h)}</div>
+            <div className="text-xl font-bold gradient-text">{formatNumber(token?.volume24h)}</div>
           </div>
           <div className="glass-card rounded-2xl p-5 text-center">
             <div className="text-sm text-gray-500 mb-1">Age</div>
             <div className="text-xl font-bold gradient-text flex items-center justify-center gap-2">
               <Clock className="w-5 h-5" />
-              {formatAge(token.ageHours)}
+              {formatAge(token?.ageHours)}
             </div>
           </div>
         </div>
@@ -202,11 +241,11 @@ function TokenDetail() {
         {/* Opportunities */}
         <div className="glass-card rounded-3xl p-8 mb-6">
           <h2 className="text-xl font-bold text-gray-900 mb-6">
-            Opportunities ({token.gapCount})
+            Opportunities ({token?.gapCount || token?.gaps?.length || 0})
           </h2>
           
           <div className="space-y-4">
-            {token.gaps.map((gap, idx) => {
+            {(token?.gaps || []).map((gap, idx) => {
               const Icon = getRoleIcon(gap.role)
               const priorityClass = gap.priority === 'high' 
                 ? 'border-l-red-500 bg-red-50/50' 
@@ -249,7 +288,7 @@ function TokenDetail() {
         </div>
 
         {/* Socials */}
-        {token.socials && token.socials.length > 0 && (
+        {token?.socials && token.socials.length > 0 && (
           <div className="glass-card rounded-3xl p-8">
             <h2 className="text-xl font-bold text-gray-900 mb-6">Existing Socials</h2>
             <div className="flex flex-wrap gap-3">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { 
   Search, 
   Filter, 
@@ -27,6 +27,7 @@ function Browse() {
     minGaps: ''
   })
   const [showFilters, setShowFilters] = useState(false)
+  const navigate = useNavigate()
 
   const fetchGigs = async () => {
     setLoading(true)
@@ -84,6 +85,12 @@ function Browse() {
     if (hours < 1) return '< 1h'
     if (hours < 24) return `${hours}h`
     return `${Math.floor(hours / 24)}d`
+  }
+
+  const handleViewDetails = (gig) => {
+    // Store the gig data in sessionStorage so detail page can access it
+    sessionStorage.setItem(`token_${gig.chain}_${gig.address}`, JSON.stringify(gig))
+    navigate(`/token/${gig.chain}/${gig.address}`)
   }
 
   return (
@@ -298,14 +305,12 @@ function Browse() {
 
                   {/* Actions */}
                   <div className="flex gap-2 mt-auto pt-4 border-t border-gray-100">
-                    <a 
-                      href={gig.dexScreenerUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button 
+                      onClick={() => handleViewDetails(gig)}
                       className="flex-1 btn-secondary text-center text-sm py-2"
                     >
                       View Details
-                    </a>
+                    </button>
                     <a 
                       href={gig.dexScreenerUrl}
                       target="_blank"
