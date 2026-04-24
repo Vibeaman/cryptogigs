@@ -302,7 +302,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { chain, role, maxAge, minGaps } = req.query;
+    const { chain, role, minAge, maxAge, minGaps } = req.query;
     
     // Fetch from all sources in parallel
     const [dexScreenerTokens, deFiLlamaTokens, coinGeckoTokens, geckoTerminalTokens] = await Promise.all([
@@ -353,6 +353,11 @@ module.exports = async (req, res) => {
     
     if (role && role !== 'all') {
       gigs = gigs.filter(g => g.gaps.some(gap => gap.role === role));
+    }
+    
+    if (minAge) {
+      const minAgeHours = parseInt(minAge);
+      gigs = gigs.filter(g => g.ageHours !== null && g.ageHours >= minAgeHours);
     }
     
     if (maxAge) {

@@ -23,6 +23,7 @@ function Browse() {
   const [filters, setFilters] = useState({
     chain: 'all',
     role: 'all',
+    minAge: '',
     maxAge: '',
     minGaps: ''
   })
@@ -36,6 +37,7 @@ function Browse() {
       const params = new URLSearchParams()
       if (filters.chain !== 'all') params.set('chain', filters.chain)
       if (filters.role !== 'all') params.set('role', filters.role)
+      if (filters.minAge) params.set('minAge', filters.minAge)
       if (filters.maxAge) params.set('maxAge', filters.maxAge)
       if (filters.minGaps) params.set('minGaps', filters.minGaps)
       
@@ -136,7 +138,7 @@ function Browse() {
               </button>
             </div>
             
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {/* Chain Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Chain</label>
@@ -169,7 +171,24 @@ function Browse() {
                 </select>
               </div>
 
-              {/* Age Filter */}
+              {/* Min Age Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Min Age</label>
+                <select 
+                  value={filters.minAge}
+                  onChange={(e) => setFilters({ ...filters, minAge: e.target.value })}
+                  className="w-full rounded-xl border border-gray-200 px-4 py-2.5 bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="">Any</option>
+                  <option value="1">1+ hours</option>
+                  <option value="6">6+ hours</option>
+                  <option value="24">1+ days</option>
+                  <option value="72">3+ days</option>
+                  <option value="168">7+ days</option>
+                </select>
+              </div>
+
+              {/* Max Age Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Max Age</label>
                 <select 
@@ -177,7 +196,7 @@ function Browse() {
                   onChange={(e) => setFilters({ ...filters, maxAge: e.target.value })}
                   className="w-full rounded-xl border border-gray-200 px-4 py-2.5 bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                  <option value="">Any Age</option>
+                  <option value="">Any</option>
                   <option value="24">Last 24 hours</option>
                   <option value="48">Last 48 hours</option>
                   <option value="168">Last 7 days</option>
