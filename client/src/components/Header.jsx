@@ -38,10 +38,10 @@ function Header() {
             </Link>
           </nav>
           
-          {/* CTA */}
+          {/* CTA - hidden on mobile, shown on larger screens */}
           <Link 
             to="/browse" 
-            className="btn-primary flex items-center gap-2 text-sm"
+            className="btn-primary hidden sm:flex items-center gap-2 text-sm"
           >
             <Sparkles className="w-4 h-4" />
             Find Opportunities
