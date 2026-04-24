@@ -180,11 +180,11 @@ function Browse() {
                   className="w-full rounded-xl border border-gray-200 px-4 py-2.5 bg-white/80 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="">Any</option>
-                  <option value="1">1+ hours</option>
+                  <option value="0.5">30+ mins</option>
+                  <option value="1">1+ hour</option>
+                  <option value="2">2+ hours</option>
                   <option value="6">6+ hours</option>
-                  <option value="24">1+ days</option>
-                  <option value="72">3+ days</option>
-                  <option value="168">7+ days</option>
+                  <option value="12">12+ hours</option>
                 </select>
               </div>
 
