@@ -298,12 +298,14 @@ function Browse() {
 
                   {/* Actions */}
                   <div className="flex gap-2 mt-auto pt-4 border-t border-gray-100">
-                    <Link 
-                      to={`/token/${gig.chain}/${gig.address}`}
+                    <a 
+                      href={gig.dexScreenerUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="flex-1 btn-secondary text-center text-sm py-2"
                     >
                       View Details
-                    </Link>
+                    </a>
                     <a 
                       href={gig.dexScreenerUrl}
                       target="_blank"
