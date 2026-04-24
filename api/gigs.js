@@ -129,20 +129,28 @@ async function fetchGeckoTerminalTokens() {
     for (const chain of chains) {
       try {
         const response = await axios.get(`https://api.geckoterminal.com/api/v2/networks/${chain}/new_pools`, {
-          params: { page: 1 }
+          params: { page: 1, include: 'base_token' }
         });
         
         const pools = response.data?.data || [];
         const tokens = pools.map(pool => {
           const attrs = pool.attributes;
+          const baseToken = pool.relationships?.base_token?.data;
+          const tokenAddr = baseToken?.id?.split('_')[1] || attrs.address;
+          
+          // Try to get image from GeckoTerminal's included data
+          const included = response.data?.included || [];
+          const tokenInfo = included.find(i => i.id === baseToken?.id);
+          const imageUrl = tokenInfo?.attributes?.image_url || null;
+          
           return {
-            tokenAddress: attrs.address,
+            tokenAddress: tokenAddr,
             chainId: chain === 'eth' ? 'ethereum' : chain,
-            name: attrs.name?.split(' / ')[0] || 'Unknown',
-            symbol: attrs.name?.split(' / ')[0]?.substring(0, 6) || '???',
-            icon: null,
+            name: tokenInfo?.attributes?.name || attrs.name?.split(' / ')[0] || 'Unknown',
+            symbol: tokenInfo?.attributes?.symbol || attrs.name?.split(' / ')[0]?.substring(0, 6) || '???',
+            icon: imageUrl,
             info: {
-              imageUrl: null,
+              imageUrl: imageUrl,
               websites: [],
               socials: []
             },
