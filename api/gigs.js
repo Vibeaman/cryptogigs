@@ -4,6 +4,26 @@ const axios = require('axios');
 const cache = new Map();
 const CACHE_TTL = 300000; // 5 minutes
 
+// Fetch token image from DexScreener as fallback
+async function fetchTokenImage(address, chain) {
+  const cacheKey = `img_${chain}_${address}`;
+  const cached = cache.get(cacheKey);
+  if (cached) return cached.data;
+  
+  try {
+    const response = await axios.get(`https://api.dexscreener.com/latest/dex/tokens/${address}`, {
+      timeout: 3000
+    });
+    const pairs = response.data?.pairs || [];
+    const imageUrl = pairs[0]?.info?.imageUrl || null;
+    cache.set(cacheKey, { data: imageUrl, time: Date.now() });
+    return imageUrl;
+  } catch (e) {
+    cache.set(cacheKey, { data: null, time: Date.now() });
+    return null;
+  }
+}
+
 // Fetch latest token profiles from DexScreener
 async function fetchDexScreenerTokens() {
   const cacheKey = 'dexscreener_tokens';
@@ -309,8 +329,23 @@ module.exports = async (req, res) => {
       return true;
     });
     
-    // Transform and filter
+    // Transform tokens
     let gigs = uniqueTokens.map(t => transformToken(t));
+    
+    // Fetch missing images from DexScreener (batch, limit to avoid timeout)
+    const gigsWithoutImages = gigs.filter(g => !g.imageUrl).slice(0, 20);
+    const imagePromises = gigsWithoutImages.map(async (gig) => {
+      const image = await fetchTokenImage(gig.address, gig.chain);
+      if (image) {
+        gig.imageUrl = image;
+        // Also update gap analysis - remove designer gap if image exists
+        gig.gaps = gig.gaps.filter(gap => gap.type !== 'branding');
+        gig.gapCount = gig.gaps.length;
+      }
+      return gig;
+    });
+    
+    await Promise.all(imagePromises);
     
     if (chain && chain !== 'all') {
       gigs = gigs.filter(g => g.chain === chain);
