@@ -149,27 +149,21 @@ function Home() {
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="flex items-center gap-4 p-4 rounded-xl bg-white/50">
-              <div className="w-12 h-12 rounded-full chain-solana flex items-center justify-center">
-                <span className="text-white font-bold">SOL</span>
-              </div>
+              <img src="/chains/solana.jpg" alt="Solana" className="w-12 h-12 rounded-full object-cover" />
               <div>
                 <div className="font-semibold">Solana</div>
                 <div className="text-sm text-gray-500">{stats?.chains?.solana || 0} tokens</div>
               </div>
             </div>
             <div className="flex items-center gap-4 p-4 rounded-xl bg-white/50">
-              <div className="w-12 h-12 rounded-full chain-base flex items-center justify-center">
-                <span className="text-white font-bold">BASE</span>
-              </div>
+              <img src="/chains/base.jpg" alt="Base" className="w-12 h-12 rounded-full object-cover" />
               <div>
                 <div className="font-semibold">Base</div>
                 <div className="text-sm text-gray-500">{stats?.chains?.base || 0} tokens</div>
               </div>
             </div>
             <div className="flex items-center gap-4 p-4 rounded-xl bg-white/50">
-              <div className="w-12 h-12 rounded-full chain-ethereum flex items-center justify-center">
-                <span className="text-white font-bold">ETH</span>
-              </div>
+              <img src="/chains/ethereum.jpg" alt="Ethereum" className="w-12 h-12 rounded-full object-cover" />
               <div>
                 <div className="font-semibold">Ethereum</div>
                 <div className="text-sm text-gray-500">{stats?.chains?.ethereum || 0} tokens</div>

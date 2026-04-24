@@ -53,11 +53,11 @@ function Browse() {
 
   const getChainBadge = (chain) => {
     const badges = {
-      solana: { class: 'chain-solana', label: 'SOL' },
-      base: { class: 'chain-base', label: 'BASE' },
-      ethereum: { class: 'chain-ethereum', label: 'ETH' }
+      solana: { icon: '/chains/solana.jpg', label: 'SOL' },
+      base: { icon: '/chains/base.jpg', label: 'BASE' },
+      ethereum: { icon: '/chains/ethereum.jpg', label: 'ETH' }
     }
-    return badges[chain] || { class: 'bg-gray-400', label: chain?.toUpperCase() || '?' }
+    return badges[chain] || { icon: null, label: chain?.toUpperCase() || '?' }
   }
 
   const getRoleIcon = (role) => {
@@ -241,9 +241,13 @@ function Browse() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <h3 className="font-semibold text-gray-900 truncate">{gig.name || 'Unknown'}</h3>
-                        <span className={`${chainBadge.class} text-white text-xs font-bold px-2 py-0.5 rounded`}>
-                          {chainBadge.label}
-                        </span>
+                        {chainBadge.icon ? (
+                          <img src={chainBadge.icon} alt={chainBadge.label} className="w-5 h-5 rounded-full object-cover" />
+                        ) : (
+                          <span className="bg-gray-400 text-white text-xs font-bold px-2 py-0.5 rounded">
+                            {chainBadge.label}
+                          </span>
+                        )}
                       </div>
                       <p className="text-sm text-gray-500">${gig.symbol}</p>
                     </div>
