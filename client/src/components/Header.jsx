@@ -10,7 +10,7 @@ function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <img src="/logo-full.jpg" alt="CryptoGigs" className="w-10 h-10 rounded-xl object-cover" />
+            <img src="/logo.png" alt="CryptoGigs" className="h-10 object-contain" />
             <span className="text-xl font-bold gradient-text">CryptoGigs</span>
           </Link>
           
